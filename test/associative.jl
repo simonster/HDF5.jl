@@ -1,5 +1,5 @@
 load("src/hdf5.jl")
-#import HDF5.*
+import HDF5.*
 #import HDF5
 
 # Create a new file
@@ -12,7 +12,9 @@ fid["Int16"] = int16(4)
 A = randn(3,5)
 write(fid, "Afloat64", float64(A))
 write(fid, "Afloat32", float32(A))
-## HDF5Attributes(fid["Afloat32"])["hi"] = 3 
+## The following worked, but seemed to affect ability to close files.
+# HDF5Attributes(fid["Afloat32"])["hi"] = 3
+##
 # Group
 g = g_create(fid, "mygroup")
 # Test dataset with compression
@@ -50,7 +52,7 @@ for (k,v) in fidr
 end
 keys(fidr)
 values(fidr) | dump
-## has(fidr, "Aint8")   # broken: p_create() issue
+has(fidr, "Aint8") 
 fidr["Float64"]  # do we want this to return the actual value rather than a reference?
 
 close(fidr)
