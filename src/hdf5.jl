@@ -222,8 +222,9 @@ const hdf5_type_map = {
 # all (like calling hdf5_type_id on BitsKind, which does not open a
 # new resource, or calling h5s_create with H5S_SCALAR).
 
-abstract HDF5Object
-abstract HDF5File <: HDF5Object
+## abstract HDF5Object  # I'm not sure we need this, but if we do, maybe we can use a Union.
+abstract HDF5Associative <: Associative{ByteString,Any}
+abstract HDF5File <: HDF5Associative
 
 # This defines an "unformatted" HDF5 data file. Formatted files are defined in separate modules.
 type PlainHDF5File <: HDF5File
@@ -243,7 +244,7 @@ PlainHDF5File(id, filename) = PlainHDF5File(id, filename, true)
 convert(::Type{C_int}, f::HDF5File) = f.id
 plain(f::HDF5File) = PlainHDF5File(f.id, f.filename, false)
 
-type HDF5Group{F<:HDF5File} <: HDF5Object
+type HDF5Group{F<:HDF5File} <: HDF5Associative
     id::Hid
     file::F         # the parent file
     toclose::Bool
@@ -261,7 +262,7 @@ HDF5Group(id, file) = HDF5Group(id, file, true)
 convert(::Type{C_int}, g::HDF5Group) = g.id
 plain(g::HDF5Group) = HDF5Group(g.id, plain(g.file), false)
 
-type HDF5Dataset{F<:HDF5File} <: HDF5Object
+type HDF5Dataset{F<:HDF5File} <: AbstractArray
     id::Hid
     file::F
     toclose::Bool
@@ -279,7 +280,7 @@ HDF5Dataset(id, file) = HDF5Dataset(id, file, true)
 convert(::Type{C_int}, dset::HDF5Dataset) = dset.id
 plain(dset::HDF5Dataset) = HDF5Dataset(dset.id, plain(dset.file), false)
 
-type HDF5Datatype <: HDF5Object
+type HDF5Datatype
     id::Hid
     toclose::Bool
 
@@ -294,7 +295,7 @@ end
 HDF5Datatype(id) = HDF5Datatype(id, true)
 convert(::Type{C_int}, dtype::HDF5Datatype) = dtype.id
 
-type HDF5Dataspace <: HDF5Object
+type HDF5Dataspace
     id::Hid
     toclose::Bool
 
@@ -309,7 +310,7 @@ end
 HDF5Dataspace(id) = HDF5Dataspace(id, true)
 convert(::Type{C_int}, dspace::HDF5Dataspace) = dspace.id
 
-type HDF5Attribute <: HDF5Object
+type HDF5Attribute
     id::Hid
     toclose::Bool
     
@@ -324,7 +325,11 @@ end
 HDF5Attribute(id) = HDF5Attribute(id, true)
 convert(::Type{C_int}, attr::HDF5Attribute) = attr.id
 
-type HDF5Properties <: HDF5Object
+type HDF5Attributes <: HDF5Associative
+    parent::Union(HDF5File, HDF5Group, HDF5Dataset)
+end
+
+type HDF5Properties <: HDF5Associative
     id::Hid
     toclose::Bool
 
@@ -430,6 +435,7 @@ root(h5file::HDF5File) = g_open(h5file, "/")
 root(obj::Union(HDF5Group, HDF5Dataset)) = g_open(file(obj), "/")
 # ref syntax: obj2 = obj1[path]
 ref(parent::Union(HDF5File, HDF5Group), path::ByteString) = o_open(parent, path)
+ref(x::HDF5Attributes, name::ByteString) = a_open(x.parent, name)
 ref(dset::HDF5Dataset, name::ByteString) = a_open(dset, name)
 
 # Create objects
@@ -465,6 +471,7 @@ p_create(class) = HDF5Properties(h5p_create(class))
 # Creates a dataset unless obj is a dataset, in which case it creates an attribute
 assign{F<:HDF5File}(parent::Union(F, HDF5Group{F}), val, path::ByteString) = write(parent, path, val)
 assign(dset::HDF5Dataset, val, name::ByteString) = write(dset, name, val)
+assign(x::HDF5Attributes, val, name::ByteString) = a_write(x.parent, name, val)
 # Getting and setting properties: p["chunk"] = dims, p["compress"] = 6
 function assign(p::HDF5Properties, val, name::ByteString)
     funcget, funcset = hdf5_prop_get_set[name]
@@ -489,7 +496,7 @@ function assign{F<:HDF5File}(parent::Union(F, HDF5Group{F}), val, path::ByteStri
 end
 
 # Check existence
-function exists(parent::Union(HDF5File, HDF5Group), path::ByteString, lapl::HDF5Properties)
+function has(parent::HDF5Associative, path::ByteString, lapl::HDF5Properties)
     parts = split(path, "/")
     name = parts[1]
     i = 1
@@ -502,16 +509,25 @@ function exists(parent::Union(HDF5File, HDF5Group), path::ByteString, lapl::HDF5
     end
     true
 end
-exists(parent::Union(HDF5File, HDF5Group), path::ByteString) = exists(parent, path, p_create())
+has(parent::HDF5Associative, path::ByteString) = has(parent, path, p_create(H5P_DEFAULT))
+get(x::HDF5Associative, path::ByteString, default) = has(x, path) ? x[path] : default
+
+del(x::HDF5Attributes, path::ByteString) = h5a_delete(x.parent, path)
+## del(x::HDF5Group, path::ByteString) =   # I'm not sure how to do this one. 
+
+## Do we support the following? It would then allow `copy`. But, where
+## would the similar data go? In memory or in the file somewhere?
+# similar(x::HDF5Associative)
 
 # Querying items in the file
-function length(x::HDF5Group)
+function length(x::HDF5Associative)
     buf = [int32(0)]
     h5g_get_num_objs(x.id, buf)
     buf[1]
 end
+isempty(x::HDF5Associative) = length(x) == 0
 
-function names(x::HDF5Group)
+function names(x::HDF5Associative)
     n = length(x)
     res = fill("", n)
     for i in 1:n
@@ -522,6 +538,43 @@ function names(x::HDF5Group)
     end
     res
 end
+
+# Collection methods:  (NOTE - a slow way of doing things!)
+start(x::HDF5Associative) = 1
+done(x::HDF5Associative, i) = i > length(x)
+next(x::HDF5Associative, i) = ((names(x)[i], x[names(x)[i]]), i + 1)
+
+# The defaults for Associatives for show aren't that great:
+show(io, x::HDF5Associative) = ccall(:jl_show_any, Void, (Any, Any,), io::IOStream, x)
+
+# Including the type in the following is messy. The source for h5dump is a huge case/if else sequence
+# It would also be nice to print the first few elements.
+function dump(io::IOStream, x::HDF5Dataset, n::Int, indent)
+    print(io, "HDF5Dataset $(size(x)) : ")
+    length(x) == 1 ? println(read(x)) :
+    # the following is a bit kludgy, but there's no way to do x[1:3] for the multidimensional case
+    ndims(x) == 1 ? Base.show_delim_array(io, x[1:min(5,size(x)[1])], '[', ',', ' ', true) :
+    ndims(x) == 2 ? Base.show_delim_array(io, x[1,1:min(5,size(x)[2])], '[', ',', ' ', true) : ""
+    println()
+end
+
+# TODO - move this to base
+function dump(io::IOStream, x::Associative, n::Int, indent)
+    println(typeof(x), " len ", length(x))
+    if n > 0
+        i = 1
+        for (k,v) in x
+            print(io, indent, "  ", k, ": ")
+            dump(io, v, n - 1, strcat(indent, "  "))
+            if i > 10
+                println(io, indent, "  ...")
+                break
+            end
+            i += 1
+        end
+    end
+end
+
 
 # Get the datatype of a dataset
 datatype(dset::HDF5Dataset) = HDF5Datatype(h5d_get_type(dset.id))
@@ -803,8 +856,13 @@ function size(dset::HDF5Dataset)
     dims, maxdims = get_dims(dspace)
     map(int, dims)
 end
+size(dset::HDF5Dataset, d) = d > ndims(dset) ? 1 : size(dset)[d]
 
 length(dset::HDF5Dataset) = prod(size(dset))
+ndims(dset::HDF5Dataset) = length(size(dset))
+
+# The defaults for AbstractArray don't work:
+show(io, x::HDF5Dataset) = ccall(:jl_show_any, Void, (Any, Any,), io::IOStream, x)
 
 # Reading arrays using ref
 function ref(dset::HDF5Dataset{PlainHDF5File}, indices::RangeIndex...)
@@ -1242,7 +1300,9 @@ const hdf5_prop_get_set = {
 
 export
     # Types 
-    HDF5Object,
+    HDF5Associative,
+    HDF5Attribute,
+    HDF5Attributes,
     HDF5File,
     HDF5Group,
     HDF5Dataset,
