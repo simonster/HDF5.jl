@@ -11,6 +11,7 @@ fid["Int16"] = int16(4)
 # Create arrays of different types
 A = randn(3,5)
 write(fid, "Afloat64", float64(A))
+write(fid, "Vfloat64", float64(randn(10)))
 write(fid, "Afloat32", float32(A))
 ## The following worked, but seemed to affect ability to close files.
 # HDF5Attributes(fid["Afloat32"])["hi"] = 3
@@ -54,5 +55,6 @@ keys(fidr)
 values(fidr) | dump
 has(fidr, "Aint8") 
 fidr["Float64"]  # do we want this to return the actual value rather than a reference?
+sum(fidr["Vfloat64"])
 
 close(fidr)
