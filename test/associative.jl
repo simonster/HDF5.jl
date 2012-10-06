@@ -34,7 +34,7 @@ write(fid, "salut", salut)
 empty = Array(Uint32, 0)
 write(fid, "empty", empty)
 # Attributes
-dset = fid["salut"]
+dset = d_open(fid, "salut")
 label = "This is a string"
 dset["typeinfo"] = label
 close(dset)
@@ -45,16 +45,14 @@ close(fid)
 fidr = h5open(fn)
 fidr | dump
 fidr["Aint8"]
-fidr["Aint8"][:,:]
 fidr["mygroup"]
-fidr["mygroup"]["CompressedA"][1:2,1:2]
+fidr["mygroup"]["CompressedA", 1:2, 1:2]
 for (k,v) in fidr
     println("$(k): value len: $(length(v))")
 end
 keys(fidr)
 values(fidr) | dump
 has(fidr, "Aint8") 
-fidr["Float64"]  # do we want this to return the actual value rather than a reference?
-sum(fidr["Vfloat64"])
-
+fidr["Float64"] 
+sum(d_open(fidr, "Vfloat64"))
 close(fidr)
