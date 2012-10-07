@@ -28,7 +28,7 @@ write(fid, "salut", salut)
 empty = Array(Uint32, 0)
 write(fid, "empty", empty)
 # Attributes
-dset = fid["salut"]
+dset = d_open(fid, "salut")
 label = "This is a string"
 dset["typeinfo"] = label
 close(dset)
@@ -82,13 +82,16 @@ Rr = read(fidr, "mygroup/CompressedA")
 @assert Rr == R
 emptyr = read(fidr, "empty")
 @assert isempty(emptyr)
-dset = fidr["salut"]
+dset = d_open(fidr, "salut")
 @assert read(dset, "typeinfo") == label
 close(dset)
-# Test ref-based reading
-Aref = fidr["Afloat64"]
+# Test default value-based reading
 sel = (2:3, 1:2:5)
-Asub = Aref[sel...]
+Asub = fidr["Afloat64", sel...]
 @assert Asub == A[sel...]
+# Test ref-based reading
+Aref = d_open(fidr, "Afloat64")
+Asub = Aref[sel...]
 close(Aref)
+@assert Asub == A[sel...]
 close(fidr)

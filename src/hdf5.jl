@@ -449,9 +449,28 @@ end
 root(h5file::HDF5File) = g_open(h5file, "/")
 root(obj::Union(HDF5Group, HDF5Dataset)) = g_open(file(obj), "/")
 # ref syntax: obj2 = obj1[path]
-ref(parent::Union(HDF5File, HDF5Group), path::ByteString) = o_open(parent, path)
 ref(x::HDF5Attributes, name::ByteString) = a_open(x.parent, name)
 ref(dset::HDF5Dataset, name::ByteString) = a_open(dset, name)
+# ref'ing a Dataset does a `read` to pull the value into memory
+function ref(parent::Union(HDF5File, HDF5Group), path::ByteString)
+    o = o_open(parent, path)
+    if isa(o, HDF5Dataset)
+        tmp = read(o)
+        close(o)
+        o = tmp
+    end
+    o
+end
+function ref(parent::Union(HDF5File, HDF5Group), path::ByteString, indices::RangeIndex...)
+    dset = o_open(parent, path)
+    if !isa(dset, HDF5Dataset)
+        close(dset)
+        error("$(path) not a Dataset")
+    end
+    result = dset[indices...]
+    close(dset)
+    result
+end
 
 # Create objects
 g_create(parent::Union(HDF5File, HDF5Group), path::ByteString, lcpl::HDF5Properties, dcpl::HDF5Properties) = HDF5Group(h5g_create(parent.id, path, lcpl.id, dcpl.id), file(parent))
@@ -594,6 +613,24 @@ function dump(io::IOStream, x::HDF5Dataset, n::Int, indent)
     ndims(x) == 1 ? Base.show_delim_array(io, x[1:min(5,size(x)[1])], '[', ',', ' ', true) :
     ndims(x) == 2 ? Base.show_delim_array(io, x[1,1:min(5,size(x)[2])], '[', ',', ' ', true) : ""
     println()
+end
+
+function dump(io::IOStream, x::HDF5Associative, n::Int, indent)
+    println(typeof(x), " len ", length(x))
+    if n > 0
+        i = 1
+        for k in keys(x)
+            print(io, indent, "  ", k, ": ")
+            v = o_open(x, k)
+            dump(io, v, n - 1, strcat(indent, "  "))
+            close(v)
+            if i > 10
+                println(io, indent, "  ...")
+                break
+            end
+            i += 1
+        end
+    end
 end
 
 # TODO - move this to base
