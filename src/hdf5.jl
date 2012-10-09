@@ -498,7 +498,7 @@ function t_commit(parent::Union(HDF5Group, HDF5Dataset), path::ByteString, dtype
     h5t_commit(parent.id, path, dtype.id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)
     dtype
 end
-a_create(dset::HDF5Dataset, path::ByteString, dtype::HDF5Datatype, dspace::HDF5Dataspace) = HDF5Attribute(h5a_create(dset.id, path, dtype.id, dspace.id))
+a_create(dset::Union(HDF5File, HDF5Group, HDF5Dataset), path::ByteString, dtype::HDF5Datatype, dspace::HDF5Dataspace) = HDF5Attribute(h5a_create(dset.id, path, dtype.id, dspace.id))
 p_create(class) = HDF5Properties(h5p_create(class))
 
 # Assign syntax: obj[path] = value
@@ -721,6 +721,21 @@ function read{F<:HDF5File}(parent::Union(F, HDF5Group{F}), name::ByteString...)
         out[i] = read(parent, name[i])
     end
     return tuple(out...)
+end
+function read{F<:HDF5File}(parent::Union(F, HDF5Group{F}))
+    # Read based on the attribute "julia_type"
+    if h5a_exists(parent.id, "julia_type")
+        T = julia_type(a_read(parent, "julia_type"))
+        if T != UnsupportedType
+            return read(parent, T)
+        end
+    end
+    # Return a Dict by default
+    d = Dict{ByteString, Any}()
+    for k in keys(parent)
+        d[k] = read(parent, k)
+    end
+    return d 
 end
 
 # "Plain" (unformatted) reads. These work only for simple types: scalars, arrays, and strings
@@ -1042,11 +1057,43 @@ readarray(attr::HDF5Attribute, type_id, buf) = h5a_read(attr.id, type_id, buf)
 writearray(dset::HDF5Dataset, type_id, buf) = h5d_write(dset.id, type_id, buf)
 writearray(attr::HDF5Attribute, type_id, buf) = h5a_write(attr.id, type_id, buf)
 
+type UnsupportedType
+end
+
+is_valid_type_ex(s::Symbol) = true
+is_valid_type_ex(x::Int) = true
+is_valid_type_ex(e::Expr) = (e.head == :curly || e.head == :tuple) && all(map(is_valid_type_ex, e.args))
+
+function julia_type(s::String)
+    e = parse(s)[1]
+    typ = UnsupportedType
+    if is_valid_type_ex(e)
+        try     # try needed to catch undefined symbols
+            typ = eval(e)
+            if !isa(typ, Type)
+                typ = UnsupportedType
+            end
+        catch
+            typ = UnsupportedType
+        end
+    else
+        typ = UnsupportedType
+    end
+    typ
+end
+
+
 # Determine Julia "native" type from the class, datatype, and dataspace
 # For datasets, defined file formats should use attributes instead
 function hdf5_to_julia(obj::Union(HDF5Dataset, HDF5Attribute))
     local T
     objtype = datatype(obj)
+    if isa(obj, HDF5Dataset) && h5a_exists(obj.id, "julia_type")
+        T = julia_type(a_read(obj, "julia_type"))
+        if T != UnsupportedType
+            return T
+        end
+    end
     try
         T = hdf5_to_julia_eltype(obj, objtype)
     catch err
