@@ -3,10 +3,10 @@
 ####################
 
 module HDF5
-
 ## Add methods to...
 import Base.setindex!, Base.close, Base.convert, Base.done, Base.dump, Base.flush, Base.has, Base.isempty, Base.isvalid, Base.length, Base.names, Base.ndims, Base.next, Base.getindex, Base.read, Base.show, Base.size, Base.start, Base.write
 
+t = time()
 ## C types
 typealias C_time_t Int
 
@@ -77,22 +77,22 @@ const H5O_TYPE_DATASET = 1
 const H5O_TYPE_NAMED_DATATYPE = 2
 # Property constants
 const H5P_DEFAULT          = 0
-const H5P_OBJECT_CREATE    = read_const(:H5P_CLS_OBJECT_CREATE_g)
+#const H5P_OBJECT_CREATE    = read_const(:H5P_CLS_OBJECT_CREATE_g)
 const H5P_FILE_CREATE      = read_const(:H5P_CLS_FILE_CREATE_g)
 const H5P_FILE_ACCESS      = read_const(:H5P_CLS_FILE_ACCESS_g)
 const H5P_DATASET_CREATE   = read_const(:H5P_CLS_DATASET_CREATE_g)
-const H5P_DATASET_ACCESS   = read_const(:H5P_CLS_DATASET_ACCESS_g)
-const H5P_DATASET_XFER     = read_const(:H5P_CLS_DATASET_XFER_g)
-const H5P_FILE_MOUNT       = read_const(:H5P_CLS_FILE_MOUNT_g)
-const H5P_GROUP_CREATE     = read_const(:H5P_CLS_GROUP_CREATE_g)
-const H5P_GROUP_ACCESS     = read_const(:H5P_CLS_GROUP_ACCESS_g)
-const H5P_DATATYPE_CREATE  = read_const(:H5P_CLS_DATATYPE_CREATE_g)
-const H5P_DATATYPE_ACCESS  = read_const(:H5P_CLS_DATATYPE_ACCESS_g)
-const H5P_STRING_CREATE    = read_const(:H5P_CLS_STRING_CREATE_g)
-const H5P_ATTRIBUTE_CREATE = read_const(:H5P_CLS_ATTRIBUTE_CREATE_g)
-const H5P_OBJECT_COPY      = read_const(:H5P_CLS_OBJECT_COPY_g)
-const H5P_LINK_CREATE      = read_const(:H5P_CLS_LINK_CREATE_g)
-const H5P_LINK_ACCESS      = read_const(:H5P_CLS_LINK_ACCESS_g)
+#const H5P_DATASET_ACCESS   = read_const(:H5P_CLS_DATASET_ACCESS_g)
+#const H5P_DATASET_XFER     = read_const(:H5P_CLS_DATASET_XFER_g)
+#const H5P_FILE_MOUNT       = read_const(:H5P_CLS_FILE_MOUNT_g)
+#const H5P_GROUP_CREATE     = read_const(:H5P_CLS_GROUP_CREATE_g)
+#const H5P_GROUP_ACCESS     = read_const(:H5P_CLS_GROUP_ACCESS_g)
+#const H5P_DATATYPE_CREATE  = read_const(:H5P_CLS_DATATYPE_CREATE_g)
+#const H5P_DATATYPE_ACCESS  = read_const(:H5P_CLS_DATATYPE_ACCESS_g)
+#const H5P_STRING_CREATE    = read_const(:H5P_CLS_STRING_CREATE_g)
+#const H5P_ATTRIBUTE_CREATE = read_const(:H5P_CLS_ATTRIBUTE_CREATE_g)
+#const H5P_OBJECT_COPY      = read_const(:H5P_CLS_OBJECT_COPY_g)
+#const H5P_LINK_CREATE      = read_const(:H5P_CLS_LINK_CREATE_g)
+#const H5P_LINK_ACCESS      = read_const(:H5P_CLS_LINK_ACCESS_g)
 # Reference constants
 const H5R_OBJECT         = 0
 const H5R_DATASET_REGION = 1
@@ -136,29 +136,29 @@ const H5T_DIR_DESCEND  = 2
 # Other type constants
 const H5T_VARIABLE     = -1
 # Type_id constants (LE = little endian, I16 = Int16, etc)
-const H5T_STD_I8LE        = read_const(:H5T_STD_I8LE_g)
-const H5T_STD_I8BE        = read_const(:H5T_STD_I8BE_g)
-const H5T_STD_U8LE        = read_const(:H5T_STD_U8LE_g)
-const H5T_STD_U8BE        = read_const(:H5T_STD_U8BE_g)
-const H5T_STD_I16LE       = read_const(:H5T_STD_I16LE_g)
-const H5T_STD_I16BE       = read_const(:H5T_STD_I16BE_g)
-const H5T_STD_U16LE       = read_const(:H5T_STD_U16LE_g)
-const H5T_STD_U16BE       = read_const(:H5T_STD_U16BE_g)
-const H5T_STD_I32LE       = read_const(:H5T_STD_I32LE_g)
-const H5T_STD_I32BE       = read_const(:H5T_STD_I32BE_g)
-const H5T_STD_U32LE       = read_const(:H5T_STD_U32LE_g)
-const H5T_STD_U32BE       = read_const(:H5T_STD_U32BE_g)
-const H5T_STD_I64LE       = read_const(:H5T_STD_I64LE_g)
-const H5T_STD_I64BE       = read_const(:H5T_STD_I64BE_g)
-const H5T_STD_U64LE       = read_const(:H5T_STD_U64LE_g)
-const H5T_STD_U64BE       = read_const(:H5T_STD_U64BE_g)
-const H5T_IEEE_F32LE      = read_const(:H5T_IEEE_F32LE_g)
-const H5T_IEEE_F32BE      = read_const(:H5T_IEEE_F32BE_g)
-const H5T_IEEE_F64LE      = read_const(:H5T_IEEE_F64LE_g)
-const H5T_IEEE_F64BE      = read_const(:H5T_IEEE_F64BE_g)
+#const H5T_STD_I8LE        = read_const(:H5T_STD_I8LE_g)
+#const H5T_STD_I8BE        = read_const(:H5T_STD_I8BE_g)
+#const H5T_STD_U8LE        = read_const(:H5T_STD_U8LE_g)
+#const H5T_STD_U8BE        = read_const(:H5T_STD_U8BE_g)
+#const H5T_STD_I16LE       = read_const(:H5T_STD_I16LE_g)
+#const H5T_STD_I16BE       = read_const(:H5T_STD_I16BE_g)
+#const H5T_STD_U16LE       = read_const(:H5T_STD_U16LE_g)
+#const H5T_STD_U16BE       = read_const(:H5T_STD_U16BE_g)
+#const H5T_STD_I32LE       = read_const(:H5T_STD_I32LE_g)
+#const H5T_STD_I32BE       = read_const(:H5T_STD_I32BE_g)
+#const H5T_STD_U32LE       = read_const(:H5T_STD_U32LE_g)
+#const H5T_STD_U32BE       = read_const(:H5T_STD_U32BE_g)
+#const H5T_STD_I64LE       = read_const(:H5T_STD_I64LE_g)
+#const H5T_STD_I64BE       = read_const(:H5T_STD_I64BE_g)
+#const H5T_STD_U64LE       = read_const(:H5T_STD_U64LE_g)
+#const H5T_STD_U64BE       = read_const(:H5T_STD_U64BE_g)
+#const H5T_IEEE_F32LE      = read_const(:H5T_IEEE_F32LE_g)
+#const H5T_IEEE_F32BE      = read_const(:H5T_IEEE_F32BE_g)
+#const H5T_IEEE_F64LE      = read_const(:H5T_IEEE_F64LE_g)
+#const H5T_IEEE_F64BE      = read_const(:H5T_IEEE_F64BE_g)
 const H5T_C_S1            = read_const(:H5T_C_S1_g)
 const H5T_STD_REF_OBJ     = read_const(:H5T_STD_REF_OBJ_g)
-const H5T_STD_REF_DSETREG = read_const(:H5T_STD_REF_DSETREG_g)
+#const H5T_STD_REF_DSETREG = read_const(:H5T_STD_REF_DSETREG_g)
 # Native types
 const H5T_NATIVE_INT8     = read_const(:H5T_NATIVE_INT8_g)
 const H5T_NATIVE_UINT8    = read_const(:H5T_NATIVE_UINT8_g)
@@ -240,7 +240,7 @@ hdf5_type_id{C<:CharType}(::Type{C})  = H5T_C_S1
 # to prevent errors in cases where the object shouldn't be closed at
 # all (like calling hdf5_type_id on BitsKind, which does not open a
 # new resource, or calling h5s_create with H5S_SCALAR).
-
+println(time()-t)
 abstract HDF5File
 
 # This defines an "unformatted" HDF5 data file. Formatted files are defined in separate modules.
@@ -483,6 +483,7 @@ immutable H5LInfo
     cset::Cint
     u::Uint64
 end
+println(time()-t)
 
 
 ### High-level interface ###
@@ -741,6 +742,7 @@ end
 size(dset::Union(HDF5Dataset, HDF5Attribute), d) = d > ndims(dset) ? 1 : size(dset)[d]
 length(dset::Union(HDF5Dataset, HDF5Attribute)) = prod(size(dset))
 ndims(dset::Union(HDF5Dataset, HDF5Attribute)) = length(size(dset))
+println(time()-t)
 
 # filename and name
 filename(obj::Union(HDF5File, HDF5Group, HDF5Dataset, HDF5Attribute, HDF5Datatype)) = h5f_get_name(obj.id)
@@ -976,6 +978,7 @@ function read{S<:ByteString}(obj::DatasetOrAttribute, ::Type{S})
     ret
 end
 # Read array of strings
+println(time()-t)
 function read{S<:ByteString}(obj::DatasetOrAttribute, ::Type{Array{S}})
     local isvar::Bool
     local ret::Array{S}
@@ -1242,6 +1245,7 @@ function write(obj::DatasetOrAttribute, str::ByteString)
           close(dtype)
     end
 end
+println(time()-t)
 # Array{String}
 function write{S<:ByteString}(obj::DatasetOrAttribute, strs::Array{S})
     dtype = datatype(strs)
@@ -1488,6 +1492,7 @@ function h5d_write{T<:Union(HDF5BitsKind,CharType)}(dataset_id::Hid, memtype_id:
     vp = vlenpack(v)
     h5d_write(dataset_id, memtype_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, vp)
 end
+println(time()-t)
 h5f_create(filename::ByteString) = h5f_create(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)
 h5f_open(filename::ByteString, mode) = h5f_open(filename, mode, H5P_DEFAULT)
 h5g_create(obj_id::Hid, name::ASCIIString) = h5g_create(obj_id, name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)
@@ -1546,17 +1551,17 @@ end
 # error messages
 for (jlname, h5name, outtype, argtypes, argsyms, msg) in
     ((:h5_close, :H5close, Herr, (), (), "Error closing the HDF5 resources"),
-     (:h5_dont_atexit, :H5dont_atexit, Herr, (), (), "Error calling dont_atexit"),
-     (:h5_garbage_collect, :H5garbage_collect, Herr, (), (), "Error on garbage collect"),
+#     (:h5_dont_atexit, :H5dont_atexit, Herr, (), (), "Error calling dont_atexit"),
+#     (:h5_garbage_collect, :H5garbage_collect, Herr, (), (), "Error on garbage collect"),
      (:h5_open, :H5open, Herr, (), (), "Error initializing the HDF5 library"),
-     (:h5_set_free_list_limits, :H5set_free_list_limits, Herr, (Cint, Cint, Cint, Cint, Cint, Cint), (:reg_global_lim, :reg_list_lim, :arr_global_lim, :arr_list_lim, :blk_global_lim, :blk_list_lim), "Error setting limits on free lists"),
+#     (:h5_set_free_list_limits, :H5set_free_list_limits, Herr, (Cint, Cint, Cint, Cint, Cint, Cint), (:reg_global_lim, :reg_list_lim, :arr_global_lim, :arr_list_lim, :blk_global_lim, :blk_list_lim), "Error setting limits on free lists"),
      (:h5a_close, :H5Aclose, Herr, (Hid,), (:id,), "Error closing attribute"),
      (:h5a_write, :H5Awrite, Herr, (Hid, Hid, Ptr{Void}), (:attr_hid, :mem_type_id, :buf), "Error writing attribute data"),
      (:h5d_close, :H5Dclose, Herr, (Hid,), (:dataset_id,), "Error closing dataset"),
      (:h5d_vlen_get_buf_size, :H5Dvlen_get_buf_size, Herr, (Hid, Hid, Hid, Ptr{Hsize}), (:dset_id, :type_id, :space_id, :buf), "Error getting vlen buffer size"),
-     (:h5d_vlen_reclaim, :H5Dvlen_reclaim, Herr, (Hid, Hid, Hid, Ptr{Void}), (:type_id, :space_id, :plist_id, :buf), "Error reclaiming vlen buffer"),
+#     (:h5d_vlen_reclaim, :H5Dvlen_reclaim, Herr, (Hid, Hid, Hid, Ptr{Void}), (:type_id, :space_id, :plist_id, :buf), "Error reclaiming vlen buffer"),
      (:h5d_write, :H5Dwrite, Herr, (Hid, Hid, Hid, Hid, Hid, Ptr{Void}), (:dataset_id, :mem_type_id, :mem_space_id, :file_space_id, :xfer_plist_id, :buf), "Error writing dataset"),
-     (:h5e_set_auto, :H5Eset_auto2, Herr, (Hid, Ptr{Void}, Ptr{Void}), (:estack_id, :func, :client_data), "Error setting error reporting behavior"),  # FIXME callbacks, for now pass C_NULL for both pointers
+#     (:h5e_set_auto, :H5Eset_auto2, Herr, (Hid, Ptr{Void}, Ptr{Void}), (:estack_id, :func, :client_data), "Error setting error reporting behavior"),  # FIXME callbacks, for now pass C_NULL for both pointers
      (:h5f_close, :H5Fclose, Herr, (Hid,), (:file_id,), "Error closing file"),
      (:h5f_flush, :H5Fflush, Herr, (Hid, Cint), (:object_id, :scope,), "Error flushing object to file"),
      (:h5g_close, :H5Gclose, Herr, (Hid,), (:group_id,), "Error closing group"),
@@ -1564,7 +1569,7 @@ for (jlname, h5name, outtype, argtypes, argsyms, msg) in
      (:h5o_get_info, :H5Oget_info, Herr, (Hid, Ptr{H5Oinfo}), (:object_id, :buf), "Error getting object info"),
      (:h5o_close, :H5Oclose, Herr, (Hid,), (:object_id,), "Error closing object"),
      (:h5p_close, :H5Pclose, Herr, (Hid,), (:id,), "Error closing property list"),
-     (:h5p_get_fclose_degree, :H5Pget_fclose_degree, Herr, (Hid, Ptr{Cint}), (:plist_id, :fc_degree), "Error getting close degree"),
+#     (:h5p_get_fclose_degree, :H5Pget_fclose_degree, Herr, (Hid, Ptr{Cint}), (:plist_id, :fc_degree), "Error getting close degree"),
      (:h5p_get_userblock, :H5Pget_userblock, Herr, (Hid, Ptr{Hsize}), (:plist_id, :len), "Error getting userblock"),
      (:h5p_set_chunk, :H5Pset_chunk, Herr, (Hid, Cint, Ptr{Hsize}), (:plist_id, :ndims, :dims), "Error setting chunk size"),
      (:h5p_set_external, :H5Pset_external, Herr, (Hid, Ptr{Uint8}, Int, Csize_t), (:plist_id, :name, :offset, :size), "Error setting external property"),
@@ -1597,11 +1602,11 @@ end
 # error messages
 for (jlname, h5name, outtype, argtypes, argsyms, ex_error) in
     ((:h5a_create, :H5Acreate2, Hid, (Hid, Ptr{Uint8}, Hid, Hid, Hid, Hid), (:loc_id, :pathname, :type_id, :space_id, :acpl_id, :aapl_id), :(error("Error creating attribute ", h5a_get_name(loc_id), "/", pathname))),
-     (:h5a_create_by_name, :H5Acreate_by_name, Hid, (Hid, Ptr{Uint8}, Ptr{Uint8}, Hid, Hid, Hid, Hid, Hid), (:loc_id, :obj_name, :attr_name, :type_id, :space_id, :acpl_id, :aapl_id, :lapl_id), :(error("Error creating attribute ", attr_name, " for object ", obj_name))),
+#     (:h5a_create_by_name, :H5Acreate_by_name, Hid, (Hid, Ptr{Uint8}, Ptr{Uint8}, Hid, Hid, Hid, Hid, Hid), (:loc_id, :obj_name, :attr_name, :type_id, :space_id, :acpl_id, :aapl_id, :lapl_id), :(error("Error creating attribute ", attr_name, " for object ", obj_name))),
      (:h5a_delete, :H5Adelete, Herr, (Hid, Ptr{Uint8}), (:loc_id, :attr_name), :(error("Error deleting attribute ", attr_name))),
      (:h5a_delete_by_idx, :H5delete_by_idx, Herr, (Hid, Ptr{Uint8}, Cint, Cint, Hsize, Hid), (:loc_id, :obj_name, :idx_type, :order, :n, :lapl_id), :(error("Error deleting attribute ", n, " from object ", obj_name))),
-     (:h5a_delete_by_name, :H5delete_by_name, Herr, (Hid, Ptr{Uint8}, Ptr{Uint8}, Hid), (:loc_id, :obj_name, :attr_name, :lapl_id), :(error("Error removing attribute ", attr_name, " from object ", obj_name))),
-     (:h5a_get_create_plist, :H5Aget_create_plist, Hid, (Hid,), (:attr_id,), :(error("Cannot get creation property list"))),
+#     (:h5a_delete_by_name, :H5delete_by_name, Herr, (Hid, Ptr{Uint8}, Ptr{Uint8}, Hid), (:loc_id, :obj_name, :attr_name, :lapl_id), :(error("Error removing attribute ", attr_name, " from object ", obj_name))),
+#     (:h5a_get_create_plist, :H5Aget_create_plist, Hid, (Hid,), (:attr_id,), :(error("Cannot get creation property list"))),
      (:h5a_get_name, :H5Aget_name, Cssize_t, (Hid, Csize_t, Ptr{Uint8}), (:attr_id, :buf_size, :buf), :(error("Error getting attribute name"))),
      (:h5a_get_name_by_idx, :H5Aget_name_by_idx, Cssize_t, (Hid, Ptr{Uint8}, Cint, Cint, Hsize, Ptr{Uint8}, Csize_t, Hid), (:loc_id, :obj_name, :index_type, :order, :idx, :name, :size, :lapl_id), :(error("Error getting attribute name"))),
      (:h5a_get_space, :H5Aget_space, Hid, (Hid,), (:attr_id,), :(error("Error getting attribute dataspace"))),
@@ -1609,30 +1614,30 @@ for (jlname, h5name, outtype, argtypes, argsyms, ex_error) in
      (:h5a_open, :H5Aopen, Hid, (Hid, Ptr{Uint8}, Hid), (:obj_id, :pathname, :aapl_id), :(error("Error opening attribute ", h5a_get_name(obj_id), "/", pathname))),
      (:h5a_read, :H5Aread, Herr, (Hid, Hid, Ptr{Uint8}), (:attr_id, :mem_type_id, :buf), :(error("Error reading attribute ", h5a_get_name(attr_id)))),
      (:h5d_create, :H5Dcreate2, Hid, (Hid, Ptr{Uint8}, Hid, Hid, Hid, Hid, Hid), (:loc_id, :pathname, :dtype_id, :space_id, :dlcpl_id, :dcpl_id, :dapl_id), :(error("Error creating dataset ", h5i_get_name(loc_id), "/", pathname))),
-     (:h5d_get_access_plist, :H5Dget_access_plist, Hid, (Hid,), (:dataset_id,), :(error("Error getting dataset access property list"))),     
-     (:h5d_get_create_plist, :H5Dget_create_plist, Hid, (Hid,), (:dataset_id,), :(error("Error getting dataset create property list"))),     
+#     (:h5d_get_access_plist, :H5Dget_access_plist, Hid, (Hid,), (:dataset_id,), :(error("Error getting dataset access property list"))),     
+#     (:h5d_get_create_plist, :H5Dget_create_plist, Hid, (Hid,), (:dataset_id,), :(error("Error getting dataset create property list"))),     
      (:h5d_get_space, :H5Dget_space, Hid, (Hid,), (:dataset_id,), :(error("Error getting dataspace"))),     
      (:h5d_get_type, :H5Dget_type, Cint, (Hid,), (:dataset_id,), :(error("Error getting dataspace type"))),
      (:h5d_open, :H5Dopen2, Hid, (Hid, Ptr{Uint8}, Hid), (:loc_id, :pathname, :dapl_id), :(error("Error opening dataset ", h5i_get_name(loc_id), "/", pathname))),
      (:h5d_read, :H5Dread, Herr, (Hid, Hid, Hid, Hid, Hid, Ptr{Void}), (:dataset_id, :mem_type_id, :mem_space_id, :file_space_id, :xfer_plist_id, :buf), :(error("Error reading dataset ", h5i_get_name(dataset_id)))),
      (:h5f_create, :H5Fcreate, Hid, (Ptr{Uint8}, Cuint, Hid, Hid), (:pathname, :flags, :fcpl_id, :fapl_id), :(error("Error creating file ", pathname))),
-     (:h5f_get_access_plist, :H5Fget_access_plist, Hid, (Hid,), (:file_id,), :(error("Error getting file access property list"))),     
-     (:h5f_get_create_plist, :H5Fget_create_plist, Hid, (Hid,), (:file_id,), :(error("Error getting file create property list"))),
+#     (:h5f_get_access_plist, :H5Fget_access_plist, Hid, (Hid,), (:file_id,), :(error("Error getting file access property list"))),     
+#     (:h5f_get_create_plist, :H5Fget_create_plist, Hid, (Hid,), (:file_id,), :(error("Error getting file create property list"))),
      (:h5f_get_name, :H5Fget_name, Cssize_t, (Hid, Ptr{Uint8}, Csize_t), (:obj_id, :buf, :buf_size), :(error("Error getting file name"))),
      (:h5f_open, :H5Fopen, Hid, (Ptr{Uint8}, Cuint, Hid), (:pathname, :flags, :fapl_id), :(error("Error opening file ", pathname))),
      (:h5g_create, :H5Gcreate2, Hid, (Hid, Ptr{Uint8}, Hid, Hid, Hid), (:loc_id, :pathname, :lcpl_id, :gcpl_id, :gapl_id), :(error("Error creating group ", h5i_get_name(loc_id), "/", pathname))),
-     (:h5g_get_create_plist, :H5Gget_create_plist, Hid, (Hid,), (:group_id,), :(error("Error getting group create property list"))),
+#     (:h5g_get_create_plist, :H5Gget_create_plist, Hid, (Hid,), (:group_id,), :(error("Error getting group create property list"))),
      (:h5g_get_objname_by_idx, :H5Gget_objname_by_idx, Hid, (Hid, Hsize, Ptr{Uint8}, Csize_t), (:loc_id, :idx, :pathname, :size), :(error("Error getting group object name ", h5i_get_name(loc_id), "/", pathname))),
      (:h5g_get_num_objs, :H5Gget_num_objs, Hid, (Hid, Ptr{Uint8}), (:loc_id, :num_obj), :(error("Error getting group length"))),
      (:h5g_open, :H5Gopen2, Hid, (Hid, Ptr{Uint8}, Hid), (:loc_id, :pathname, :gapl_id), :(error("Error opening group ", h5i_get_name(loc_id), "/", pathname))),
      (:h5i_get_file_id, :H5Iget_file_id, Hid, (Hid,), (:obj_id,), :(error("Error getting file identifier"))),
      (:h5i_get_name, :H5Iget_name, Cssize_t, (Hid, Ptr{Uint8}, Csize_t), (:obj_id, :buf, :buf_size), :(error("Error getting object name"))),
-     (:h5i_get_ref, :H5Iget_ref, Cint, (Hid,), (:obj_id,), :(error("Error getting reference count"))),
+#     (:h5i_get_ref, :H5Iget_ref, Cint, (Hid,), (:obj_id,), :(error("Error getting reference count"))),
      (:h5i_get_type, :H5Iget_type, Cint, (Hid,), (:obj_id,), :(error("Error getting type"))),
      (:h5l_delete, :H5Ldelete, Herr, (Hid, Ptr{Uint8}, Hid), (:obj_id, :pathname, :lapl_id), :(error("Error deleting ", h5i_get_name(obj_id), "/", pathname))),
-     (:h5l_create_external, :H5Lcreate_hard_external, Herr, (Ptr{Uint8}, Ptr{Uint8}, Hid, Ptr{Uint8}, Hid, Hid), (:target_file_name, :target_obj_name, :link_loc_id, :link_name, :lcpl_id, :lapl_id), :(error("Error creating external link ", link_name, " pointing to ", target_obj_name, " in file ", target_file_name))),
-     (:h5l_create_hard, :H5Lcreate_hard, Herr, (Hid, Ptr{Uint8}, Hid, Ptr{Uint8}, Hid, Hid), (:obj_loc_id, :obj_name, :link_loc_id, :link_name, :lcpl_id, :lapl_id), :(error("Error creating hard link ", link_name, " pointing to ", obj_name))),
-     (:h5l_create_soft, :H5Lcreate_soft, Herr, (Ptr{Uint8}, Hid, Ptr{Uint8}, Hid, Hid), (:target_path, :link_loc_id, :link_name, :lcpl_id, :lapl_id), :(error("Error creating soft link ", link_name, " pointing to ", target_path))),
+#     (:h5l_create_external, :H5Lcreate_hard_external, Herr, (Ptr{Uint8}, Ptr{Uint8}, Hid, Ptr{Uint8}, Hid, Hid), (:target_file_name, :target_obj_name, :link_loc_id, :link_name, :lcpl_id, :lapl_id), :(error("Error creating external link ", link_name, " pointing to ", target_obj_name, " in file ", target_file_name))),
+#     (:h5l_create_hard, :H5Lcreate_hard, Herr, (Hid, Ptr{Uint8}, Hid, Ptr{Uint8}, Hid, Hid), (:obj_loc_id, :obj_name, :link_loc_id, :link_name, :lcpl_id, :lapl_id), :(error("Error creating hard link ", link_name, " pointing to ", obj_name))),
+#     (:h5l_create_soft, :H5Lcreate_soft, Herr, (Ptr{Uint8}, Hid, Ptr{Uint8}, Hid, Hid), (:target_path, :link_loc_id, :link_name, :lcpl_id, :lapl_id), :(error("Error creating soft link ", link_name, " pointing to ", target_path))),
      (:h5l_exists, :H5Lexists, Htri, (Hid, Ptr{Uint8}, Hid), (:loc_id, :pathname, :lapl_id), :(error("Cannot determine whether link ", h5i_get_name(loc_id), "/", pathname, " exists, check each item along the path"))),
      (:h5l_get_info, :H5Lget_info, Herr, (Hid, Ptr{Uint8}, Ptr{H5LInfo}, Hid), (:link_loc_id, :link_name, :link_buf, :lapl_id), :(error("Error getting info for link ", link_name))),
      (:h5o_open, :H5Oopen, Hid, (Hid, Ptr{Uint8}, Hid), (:loc_id, :pathname, :lapl_id), :(error("Error opening object ", h5i_get_name(loc_id), "/", pathname))),
@@ -1642,8 +1647,8 @@ for (jlname, h5name, outtype, argtypes, argsyms, ex_error) in
      (:h5p_get_layout, :H5Pget_layout, Cint, (Hid,), (:plist_id,), :(error("Error getting layout"))),
      (:h5r_create, :H5Rcreate, Herr, (Ptr{Void}, Hid, Ptr{Uint8}, Cint, Hid), (:ref, :loc_id, :pathname, :ref_type, :space_id), :(error("Error creating reference to object ", hi5_get_name(loc_id), "/", pathname))),
      (:h5r_dereference, :H5Rdereference, Hid, (Hid, Cint, Ptr{Void}), (:obj_id, :ref_type, :ref), :(error("Error dereferencing object"))),
-     (:h5r_get_obj_type, :H5Rget_obj_type2, Herr, (Hid, Cint, Ptr{Void}, Ptr{Cint}), (:loc_id, :ref_type, :ref, :obj_type), :(error("Error getting object type"))),
-     (:h5r_get_region, :H5Rget_region, Hid, (Hid, Cint, Ptr{Void}), (:loc_id, :ref_type, :ref), :(error("Error getting region from reference"))),
+#     (:h5r_get_obj_type, :H5Rget_obj_type2, Herr, (Hid, Cint, Ptr{Void}, Ptr{Cint}), (:loc_id, :ref_type, :ref, :obj_type), :(error("Error getting object type"))),
+#     (:h5r_get_region, :H5Rget_region, Hid, (Hid, Cint, Ptr{Void}), (:loc_id, :ref_type, :ref), :(error("Error getting region from reference"))),
      (:h5s_copy, :H5Scopy, Hid, (Hid,), (:space_id,), :(error("Error copying dataspace"))),
      (:h5s_create, :H5Screate, Hid, (Cint,), (:class,), :(error("Error creating dataspace"))),
      (:h5s_create_simple, :H5Screate_simple, Hid, (Cint, Ptr{Hsize}, Ptr{Hsize}), (:rank, :current_dims, :maximum_dims), :(error("Error creating simple dataspace"))),
@@ -1654,9 +1659,9 @@ for (jlname, h5name, outtype, argtypes, argsyms, ex_error) in
      (:h5t_create, :H5Tcreate, Hid, (Cint, Csize_t), (:class_id, :sz), :(error("Error creating datatype of id ", classid))),
      (:h5t_get_class, :H5Tget_class, Cint, (Hid,), (:dtype_id,), :(error("Error getting class"))),
      (:h5t_get_cset, :H5Tget_cset, Cint, (Hid,), (:dtype_id,), :(error("Error getting character set encoding"))),
-     (:h5t_get_member_class, :H5Tget_member_class, Cint, (Hid, Cuint), (:dtype_id, :index), :(error("Error getting class of compound datatype member #", index))),
-     (:h5t_get_member_index, :H5Tget_member_index, Cint, (Hid, Ptr{Uint8}), (:dtype_id, :membername), :(error("Error getting index of compound datatype member \"", membername, "\""))),
-     (:h5t_get_member_offset, :H5Tget_member_offset, Csize_t, (Hid, Cuint), (:dtype_id, :index), :(error("Error getting offset of compound datatype member #", index))),
+#     (:h5t_get_member_class, :H5Tget_member_class, Cint, (Hid, Cuint), (:dtype_id, :index), :(error("Error getting class of compound datatype member #", index))),
+#     (:h5t_get_member_index, :H5Tget_member_index, Cint, (Hid, Ptr{Uint8}), (:dtype_id, :membername), :(error("Error getting index of compound datatype member \"", membername, "\""))),
+#     (:h5t_get_member_offset, :H5Tget_member_offset, Csize_t, (Hid, Cuint), (:dtype_id, :index), :(error("Error getting offset of compound datatype member #", index))),
      (:h5t_get_member_type, :H5Tget_member_type, Hid, (Hid, Cuint), (:dtype_id, :index), :(error("Error getting type of compound datatype member #", index))),
      (:h5t_get_native_type, :H5Tget_native_type, Hid, (Hid, Cint), (:dtype_id, :direction), :(error("Error getting native type"))),
      (:h5t_get_nmembers, :H5Tget_nmembers, Cint, (Hid,), (:dtype_id,), :(error("Error getting the number of members"))),
@@ -1687,11 +1692,11 @@ end
 # Functions like the above, returning a Julia boolean
 for (jlname, h5name, outtype, argtypes, argsyms, ex_error) in
     ((:h5a_exists, :H5Aexists, Htri, (Hid, Ptr{Uint8}), (:obj_id, :attr_name), :(error("Error checking whether attribute ", attr_name, " exists"))),
-     (:h5a_exists_by_name, :H5Aexists_by_name, Htri, (Hid, Ptr{Uint8}, Ptr{Uint8}, Hid), (:loc_id, :obj_name, :attr_name, :lapl_id), :(error("Error checking whether object ", obj_name, " has attribute ", attr_name))),
+#     (:h5a_exists_by_name, :H5Aexists_by_name, Htri, (Hid, Ptr{Uint8}, Ptr{Uint8}, Hid), (:loc_id, :obj_name, :attr_name, :lapl_id), :(error("Error checking whether object ", obj_name, " has attribute ", attr_name))),
      (:h5f_is_hdf5, :H5Fis_hdf5, Htri, (Ptr{Uint8},), (:pathname,), :(error("Cannot access file ", pathname))),
      (:h5i_is_valid, :H5Iis_valid, Htri, (Hid,), (:obj_id,), :(error("Cannot determine whether object is valid"))),
      (:h5l_exists, :H5Lexists, Htri, (Hid, Ptr{Uint8}, Hid), (:loc_id, :pathname, :lapl_id), :(error("Cannot determine whether ", pathname, " exists"))),
-     (:h5s_is_simple, :H5Sis_simple, Htri, (Hid,), (:space_id,), :(error("Error determining whether dataspace is simple"))),
+#     (:h5s_is_simple, :H5Sis_simple, Htri, (Hid,), (:space_id,), :(error("Error determining whether dataspace is simple"))),
      (:h5t_is_variable_str, :H5Tis_variable_str, Htri, (Hid,), (:type_id,), :(error("Error determining whether string is of variable length"))),
 )
     ex_dec = funcdecexpr(jlname, length(argtypes), argsyms)
@@ -1741,6 +1746,7 @@ function h5i_get_name(loc_id::Hid)
     h5i_get_name(loc_id, buf, len+1)
     convert(ASCIIString, buf[1:len])
 end
+println(time()-t)
 function h5l_get_info(link_loc_id::Hid, link_name::ASCIIString, lapl_id::Hid)
     info = Array(H5LInfo, 1)
     h5l_get_info(link_loc_id, link_name, info, lapl_id)
@@ -1868,4 +1874,5 @@ export
     write,
     @write
 
+println(time()-t)
 end  # module
